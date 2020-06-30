@@ -1,0 +1,353 @@
+# SPECTRUM KERNEL MANAGER
+# Ramdisk file for profile based kernel management
+
+# Initialization
+on property:sys.boot_completed=1
+   # Set default profile on first boot
+   exec u:r:init:s0 root root -- /init.spectrum.sh
+   exec u:r:su:s0 root root -- /init.spectrum.sh
+   # Enable Spectrum support
+   setprop spectrum.support 1
+   # Add kernel name
+   setprop persist.spectrum.kernel FOE
+// cpu_freq_lilte		cpu_freq_big
+// --------------------------------------------------
+// 509000				682000
+// 1018000				1018000
+// 1210000				1210000
+// 1402000				1364000
+// 1556000				1498000
+// 1690000				1652000
+// 1844000				1863000
+//							2093000
+//							2362000
+//GPU freq
+// 103750000
+// 150909000
+// 237143000
+// 332000000
+// 415000000
+// 550000000
+// 667000000
+// 767000000
+// gpu_scene_aware
+// 
+# OP5 -- Lenovo ZUK Z2 (Plus)  --
+on property:persist.spectrum.profile=0
+
+chown root /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+chown root /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
+chown root /sys/module/lowmemorykiller/parameters/minfree
+chmod 0664 /sys/module/lowmemorykiller/parameters/minfree
+#liltle_cluster
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "op5"
+chown root /sys/devices/system/cpu/cpu0/cpufreq/op5/down_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/op5/down_rate_limit_us
+chown root /sys/devices/system/cpu/cpu0/cpufreq/op5/up_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/op5/up_rate_limit_us
+chown root /sys/devices/system/cpu/cpu0/cpufreq/op5/iowait_boost_enable
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/op5/iowait_boost_enable
+write /sys/devices/system/cpu/cpu0/cpufreq/op5/down_rate_limit_us "200"
+write /sys/devices/system/cpu/cpu0/cpufreq/op5/up_rate_limit_us "2500"
+write /sys/devices/system/cpu/cpu0/cpufreq/op5/iowait_boost_enable "0"
+#big_cluster
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor "op5"
+chown root /sys/devices/system/cpu/cpu4/cpufreq/op5/down_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/op5/down_rate_limit_us
+chown root /sys/devices/system/cpu/cpu4/cpufreq/op5/up_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/op5/up_rate_limit_us
+chown root /sys/devices/system/cpu/cpu4/cpufreq/op5/iowait_boost_enable
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/op5/iowait_boost_enable
+write /sys/devices/system/cpu/cpu4/cpufreq/op5/down_rate_limit_us "200"
+write /sys/devices/system/cpu/cpu4/cpufreq/op5/up_rate_limit_us "4500"
+write /sys/devices/system/cpu/cpu4/cpufreq/op5/iowait_boost_enable "0"
+write /sys/kernel/mm/uksm/run "0"
+#cpu_freq
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 509000
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1844000
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 682000
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq 2362000
+#write /sys/module/cpu_boost/parameters/input_boost_freq "0:0 1:0 2:0 3:0 4:0 5:0 6:0 7:0"
+write /sys/module/cpu_boost/parameters/input_boost_freq "0:1018000 1:1018000 2:1018000 3:1018000 4:1498000 5:1498000 6:1498000 7:1498000"
+write /sys/module/cpu_boost/parameters/input_boost_enabled 1
+write /sys/module/cpu_boost/parameters/input_boost_ms 65
+write /sys/module/cpu_boost/parameters/dynamic_stune_boost 5
+write /sys/module/workqueue/parameters/power_efficient "Y"
+write /sys/class/devfreq/gpufreq/governor "gpu_scene_aware"
+write /sys/class/devfreq/gpufreq/min_freq 237143000
+write /sys/class/devfreq/gpufreq/max_freq 767000000
+#memfree
+chown root /sys/module/lowmemorykiller/parameters/minfree
+chmod 0664 /sys/module/lowmemorykiller/parameters/minfree
+write /sys/module/lowmemorykiller/parameters/minfree "29240,43860,87720,146200,204680,219300"
+#write /sys/block/zram0/disksize "134217728" //128
+#write /sys/block/zram0/disksize "1073741824" //1024
+#dynamic stune 
+write /dev/stune/schedtune.boost 1
+write /dev/stune/foreground/schedtune.boost 0
+write /dev/stune/foreground/schedtune.prefer_idle 1
+write /dev/stune/top-app/schedtune.boost 8
+write /dev/stune/top-app/schedtune.prefer_idle 1
+write /dev/stune/rt/schedtune.boost 0
+write /dev/stune/background/schedtune.boost 0
+#io_scheduler
+#write /sys/block/sda/queue/iostats 1
+#write /sys/block/sda/queue/read_ahead_kb 128
+#write /sys/block/sda/queue/scheduler "none"
+write /sys/block/sda/queue/rq_affinity 1
+#entropy
+write /proc/sys/kernel/random/read_wakeup_threshold 64
+write /proc/sys/kernel/random/write_wakeup_threshold 128
+
+# Performance -helix_schedutil
+on property:persist.spectrum.profile=1
+
+chown root /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+chown root /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
+chown root /sys/module/lowmemorykiller/parameters/minfree
+chmod 0664 /sys/module/lowmemorykiller/parameters/minfree
+#liltle_cluster
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "blu_schedutil"
+chown root /sys/devices/system/cpu/cpu0/cpufreq/blu_schedutil/down_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/blu_schedutil/down_rate_limit_us
+chown root /sys/devices/system/cpu/cpu0/cpufreq/blu_schedutil/up_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/blu_schedutil/up_rate_limit_us
+chown root /sys/devices/system/cpu/cpu0/cpufreq/blu_schedutil/iowait_boost_enable
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/blu_schedutil/iowait_boost_enable
+write /sys/devices/system/cpu/cpu0/cpufreq/blu_schedutil/down_rate_limit_us "200"
+write /sys/devices/system/cpu/cpu0/cpufreq/blu_schedutil/up_rate_limit_us "2500"
+write /sys/devices/system/cpu/cpu0/cpufreq/blu_schedutil/iowait_boost_enable "0"
+#big_cluster
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor "blu_schedutil"
+chown root /sys/devices/system/cpu/cpu4/cpufreq/blu_schedutil/down_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/blu_schedutil/down_rate_limit_us
+chown root /sys/devices/system/cpu/cpu4/cpufreq/blu_schedutil/up_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/blu_schedutil/up_rate_limit_us
+chown root /sys/devices/system/cpu/cpu4/cpufreq/blu_schedutil/iowait_boost_enable
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/blu_schedutil/iowait_boost_enable
+write /sys/devices/system/cpu/cpu4/cpufreq/blu_schedutil/down_rate_limit_us "200"
+write /sys/devices/system/cpu/cpu4/cpufreq/blu_schedutil/up_rate_limit_us "4500"
+write /sys/devices/system/cpu/cpu4/cpufreq/blu_schedutil/iowait_boost_enable "0"
+write /sys/kernel/mm/uksm/run "0"
+#cpu_freq
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 509000
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1690000
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 682000
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq 2093000
+write /sys/module/cpu_boost/parameters/input_boost_freq "0:0 1:0 2:0 3:0 4:0 5:0 6:0 7:0"
+#write /sys/module/cpu_boost/parameters/input_boost_freq "0:1402000 1:1402000 2:1402000 3:1402000 4:1652000 5:1652000 6:1652000 7:1652000"
+write /sys/module/cpu_boost/parameters/input_boost_enabled 0
+write /sys/module/cpu_boost/parameters/input_boost_ms 0
+write /sys/module/cpu_boost/parameters/dynamic_stune_boost 8
+write /sys/module/workqueue/parameters/power_efficient "Y"
+write /sys/class/devfreq/gpufreq/governor "gpu_scene_aware"
+write /sys/class/devfreq/gpufreq/min_freq 237143000
+write /sys/class/devfreq/gpufreq/max_freq 767000000
+#dynamic stune 
+write /dev/stune/schedtune.boost 1
+write /dev/stune/foreground/schedtune.boost 0
+write /dev/stune/foreground/schedtune.prefer_idle 1
+write /dev/stune/top-app/schedtune.boost 8
+write /dev/stune/top-app/schedtune.prefer_idle 1
+write /dev/stune/rt/schedtune.boost 0
+write /dev/stune/background/schedtune.boost 0
+#io_scheduler
+#write /sys/block/sda/queue/iostats 1
+#write /sys/block/sda/queue/read_ahead_kb 128
+#write /sys/block/sda/queue/scheduler "zen"
+write /sys/block/sda/queue/rq_affinity 1
+#entropy
+write /proc/sys/kernel/random/read_wakeup_threshold 64
+write /proc/sys/kernel/random/write_wakeup_threshold 128
+
+# Battery - schedutil
+on property:persist.spectrum.profile=2
+
+chown root /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+chown root /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
+#liltle_cluster
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "op5"
+chown root /sys/devices/system/cpu/cpu0/cpufreq/op5/down_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/op5/down_rate_limit_us
+chown root /sys/devices/system/cpu/cpu0/cpufreq/op5/up_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/op5/up_rate_limit_us
+chown root /sys/devices/system/cpu/cpu0/cpufreq/op5/iowait_boost_enable
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/op5/iowait_boost_enable
+write /sys/devices/system/cpu/cpu0/cpufreq/op5/down_rate_limit_us "20000"
+write /sys/devices/system/cpu/cpu0/cpufreq/op5/up_rate_limit_us "500"
+write /sys/devices/system/cpu/cpu0/cpufreq/op5/iowait_boost_enable "0"
+#big_cluster
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor "op5"
+chown root /sys/devices/system/cpu/cpu4/cpufreq/op5/down_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/op5/down_rate_limit_us
+chown root /sys/devices/system/cpu/cpu4/cpufreq/op5/up_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/op5/up_rate_limit_us
+chown root /sys/devices/system/cpu/cpu4/cpufreq/op5/iowait_boost_enable
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/op5/iowait_boost_enable
+write /sys/devices/system/cpu/cpu4/cpufreq/op5/down_rate_limit_us "20000"
+write /sys/devices/system/cpu/cpu4/cpufreq/op5/up_rate_limit_us "500"
+write /sys/devices/system/cpu/cpu4/cpufreq/op5/iowait_boost_enable "0"
+write /sys/kernel/mm/uksm/run "0"
+#cpu_freq
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 509000
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1690000
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 682000
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq 2093000
+write /sys/module/cpu_boost/parameters/input_boost_freq "0:0 1:0 2:0 3:0 4:0 5:0 6:0 7:0"
+#write /sys/module/cpu_boost/parameters/input_boost_freq "0:1402000 1:1402000 2:1402000 3:1402000 4:1652000 5:1652000 6:1652000 7:1652000"
+write /sys/module/cpu_boost/parameters/input_boost_enabled 0
+write /sys/module/cpu_boost/parameters/input_boost_ms 0
+write /sys/module/cpu_boost/parameters/dynamic_stune_boost 8
+write /sys/module/workqueue/parameters/power_efficient "Y"
+write /sys/class/devfreq/gpufreq/governor "gpu_scene_aware"
+#write /sys/class/devfreq/gpufreq/governor "simple_ondemand"
+write /sys/class/devfreq/gpufreq/min_freq 237143000
+write /sys/class/devfreq/gpufreq/max_freq 767000000
+#dynamic stune 
+write /dev/stune/schedtune.boost 1
+write /dev/stune/foreground/schedtune.boost 0
+write /dev/stune/foreground/schedtune.prefer_idle 1
+write /dev/stune/top-app/schedtune.boost 8
+write /dev/stune/top-app/schedtune.prefer_idle 1
+write /dev/stune/rt/schedtune.boost 0
+write /dev/stune/background/schedtune.boost 0
+#io_scheduler
+#write /sys/block/sda/queue/iostats 1
+#write /sys/block/sda/queue/read_ahead_kb 128
+#write /sys/block/sda/queue/scheduler "zen"
+write /sys/block/sda/queue/rq_affinity 1
+#entropy
+write /proc/sys/kernel/random/read_wakeup_threshold 64
+write /proc/sys/kernel/random/write_wakeup_threshold 128
+
+# Gaming - pwrutilx
+on property:persist.spectrum.profile=3
+
+chown root /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+chown root /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
+#liltle_cluster
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "schedutil"
+chown root /sys/devices/system/cpu/cpu0/cpufreq/schedutil/down_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/schedutil/down_rate_limit_us
+chown root /sys/devices/system/cpu/cpu0/cpufreq/schedutil/up_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/schedutil/up_rate_limit_us
+chown root /sys/devices/system/cpu/cpu0/cpufreq/schedutil/iowait_boost_enable
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/schedutil/iowait_boost_enable
+write /sys/devices/system/cpu/cpu0/cpufreq/schedutil/down_rate_limit_us "20000"
+write /sys/devices/system/cpu/cpu0/cpufreq/schedutil/up_rate_limit_us "500"
+write /sys/devices/system/cpu/cpu0/cpufreq/schedutil/iowait_boost_enable "0"
+#big_cluster
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor "schedutil"
+chown root /sys/devices/system/cpu/cpu4/cpufreq/schedutil/down_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/schedutil/down_rate_limit_us
+chown root /sys/devices/system/cpu/cpu4/cpufreq/schedutil/up_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/schedutil/up_rate_limit_us
+chown root /sys/devices/system/cpu/cpu4/cpufreq/schedutil/iowait_boost_enable
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/schedutil/iowait_boost_enable
+write /sys/devices/system/cpu/cpu4/cpufreq/schedutil/down_rate_limit_us "20000"
+write /sys/devices/system/cpu/cpu4/cpufreq/schedutil/up_rate_limit_us "500"
+write /sys/devices/system/cpu/cpu4/cpufreq/schedutil/iowait_boost_enable "0"
+write /sys/kernel/mm/uksm/run "0"
+#cpu_freq
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 509000
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1844000
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 682000
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq 2362000
+write /sys/module/cpu_boost/parameters/input_boost_freq "0:0 1:0 2:0 3:0 4:0 5:0 6:0 7:0"
+#write /sys/module/cpu_boost/parameters/input_boost_freq "0:0 1:0 2:0 3:0 4:1210000 5:1210000 6:1210000 7:1210000"
+write /sys/module/cpu_boost/parameters/input_boost_enabled 0
+write /sys/module/cpu_boost/parameters/input_boost_ms 0
+write /sys/module/cpu_boost/parameters/dynamic_stune_boost 8
+write /sys/module/workqueue/parameters/power_efficient "Y"
+write /sys/class/devfreq/gpufreq/governor "gpu_scene_aware"
+#write /sys/class/devfreq/gpufreq/governor "simple_ondemand"
+write /sys/class/devfreq/gpufreq/min_freq 237143000
+write /sys/class/devfreq/gpufreq/max_freq 767000000
+#dynamic stune 
+write /dev/stune/schedtune.boost 1
+write /dev/stune/foreground/schedtune.boost 0
+write /dev/stune/foreground/schedtune.prefer_idle 1
+write /dev/stune/top-app/schedtune.boost 1
+write /dev/stune/top-app/schedtune.prefer_idle 1
+write /dev/stune/rt/schedtune.boost 0
+write /dev/stune/background/schedtune.boost 0
+#io_scheduler
+#write /sys/block/sda/queue/iostats 1
+#write /sys/block/sda/queue/read_ahead_kb 128
+#write /sys/block/sda/queue/scheduler "zen"
+write /sys/block/sda/queue/rq_affinity 1
+#entropy
+write /proc/sys/kernel/random/read_wakeup_threshold 64
+write /proc/sys/kernel/random/write_wakeup_threshold 128
+#write /sys/block/zram0/disksize "1073741824" //1024
+
+# Gaming - pwrutilx
+on property:persist.spectrum.profile=4
+
+chown root /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+chown root /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
+#liltle_cluster
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "pwrutilx"
+chown root /sys/devices/system/cpu/cpu0/cpufreq/pwrutilx/down_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/pwrutilx/down_rate_limit_us
+chown root /sys/devices/system/cpu/cpu0/cpufreq/pwrutilx/up_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/pwrutilx/up_rate_limit_us
+chown root /sys/devices/system/cpu/cpu0/cpufreq/pwrutilx/iowait_boost_enable
+chmod 0664 /sys/devices/system/cpu/cpu0/cpufreq/pwrutilx/iowait_boost_enable
+write /sys/devices/system/cpu/cpu0/cpufreq/pwrutilx/down_rate_limit_us "20000"
+write /sys/devices/system/cpu/cpu0/cpufreq/pwrutilx/up_rate_limit_us "500"
+write /sys/devices/system/cpu/cpu0/cpufreq/pwrutilx/iowait_boost_enable "0"
+#big_cluster
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor "pwrutilx"
+chown root /sys/devices/system/cpu/cpu4/cpufreq/pwrutilx/down_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/pwrutilx/down_rate_limit_us
+chown root /sys/devices/system/cpu/cpu4/cpufreq/pwrutilx/up_rate_limit_us
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/pwrutilx/up_rate_limit_us
+chown root /sys/devices/system/cpu/cpu4/cpufreq/pwrutilx/iowait_boost_enable
+chmod 0664 /sys/devices/system/cpu/cpu4/cpufreq/pwrutilx/iowait_boost_enable
+write /sys/devices/system/cpu/cpu4/cpufreq/pwrutilx/down_rate_limit_us "20000"
+write /sys/devices/system/cpu/cpu4/cpufreq/pwrutilx/up_rate_limit_us "500"
+write /sys/devices/system/cpu/cpu4/cpufreq/pwrutilx/iowait_boost_enable "0"
+write /sys/kernel/mm/uksm/run "0"
+#cpu_freq
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 509000
+write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1844000
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq 682000
+write /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq 2093000
+write /sys/module/cpu_boost/parameters/input_boost_freq "0:0 1:0 2:0 3:0 4:0 5:0 6:0 7:0"
+#write /sys/module/cpu_boost/parameters/input_boost_freq "0:0 1:0 2:0 3:0 4:1210000 5:1210000 6:1210000 7:1210000"
+write /sys/module/cpu_boost/parameters/input_boost_enabled 0
+write /sys/module/cpu_boost/parameters/input_boost_ms 0
+write /sys/module/cpu_boost/parameters/dynamic_stune_boost 8
+write /sys/module/workqueue/parameters/power_efficient "Y"
+write /sys/class/devfreq/gpufreq/governor "gpu_scene_aware"
+#write /sys/class/devfreq/gpufreq/governor "simple_ondemand"
+write /sys/class/devfreq/gpufreq/min_freq 237143000
+write /sys/class/devfreq/gpufreq/max_freq 767000000
+#dynamic stune 
+write /dev/stune/schedtune.boost 1
+write /dev/stune/foreground/schedtune.boost 0
+write /dev/stune/foreground/schedtune.prefer_idle 1
+write /dev/stune/top-app/schedtune.boost 1
+write /dev/stune/top-app/schedtune.prefer_idle 1
+write /dev/stune/rt/schedtune.boost 0
+write /dev/stune/background/schedtune.boost 0
+#io_scheduler
+#write /sys/block/sda/queue/iostats 1
+#write /sys/block/sda/queue/read_ahead_kb 128
+#write /sys/block/sda/queue/scheduler "zen"
+write /sys/block/sda/queue/rq_affinity 1
+#entropy
+write /proc/sys/kernel/random/read_wakeup_threshold 64
+write /proc/sys/kernel/random/write_wakeup_threshold 128
+#write /sys/block/zram0/disksize "1073741824" //1024
